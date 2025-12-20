@@ -10,18 +10,18 @@ import (
 )
 
 type RenderLoop struct {
-	openGLVersion   string
-	basicShader     uint32
-	triangleVAO     uint32
-	clearColor      mgl32.Vec4
-	window          *Window
-	currentShaderID uint32
-	projection      mgl32.Mat4
-	camera          mgl32.Mat4
-	model           mgl32.Mat4
-	cameraPos       mgl32.Vec3
-	cameraTarget    mgl32.Vec3
-	FOV             float32
+	openGLVersion string
+	basicShader   *Shader
+	triangleVAO   uint32
+	clearColor    mgl32.Vec4
+	window        *Window
+	currentShader *Shader
+	projection    mgl32.Mat4
+	camera        mgl32.Mat4
+	model         mgl32.Mat4
+	cameraPos     mgl32.Vec3
+	cameraTarget  mgl32.Vec3
+	FOV           float32
 }
 
 func (loop *RenderLoop) Initialize(window *Window) {
@@ -37,13 +37,9 @@ func (loop *RenderLoop) Initialize(window *Window) {
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Println("OpenGL version", version)
 
-	shader, err := NewProgramFile("basic")
-	if err != nil {
-		fmt.Println("Failed to do a shader")
-		panic(err)
-	}
-	loop.basicShader = shader
-	loop.triangleVAO = GetTriangleMesh(shader)
+	loop.basicShader = &Shader{}
+	loop.basicShader.LoadFile("basic")
+	loop.triangleVAO = GetTriangleMesh(loop.basicShader.ID)
 }
 
 func (loop *RenderLoop) Clear() {
@@ -70,19 +66,15 @@ func (loop *RenderLoop) UpdateCameraMatrices() {
 }
 
 func (loop *RenderLoop) AssignCameraMatrices() {
-	projectionUniform := gl.GetUniformLocation(loop.currentShaderID, GLString("projection"))
-	gl.UniformMatrix4fv(projectionUniform, 1, false, &loop.projection[0])
-
-	cameraUniform := gl.GetUniformLocation(loop.currentShaderID, GLString("camera"))
-	gl.UniformMatrix4fv(cameraUniform, 1, false, &loop.camera[0])
-
-	modelUniform := gl.GetUniformLocation(loop.currentShaderID, GLString("model"))
-	gl.UniformMatrix4fv(modelUniform, 1, false, &loop.model[0])
+	shader := loop.currentShader
+	shader.UniformSetMat4("projection", &loop.projection)
+	shader.UniformSetMat4("camera", &loop.camera)
+	shader.UniformSetMat4("model", &loop.model)
 }
 
-func (loop *RenderLoop) AssignShaderID(shaderID uint32) {
-	loop.currentShaderID = shaderID
-	gl.UseProgram(shaderID)
+func (loop *RenderLoop) AssignShader(shader *Shader) {
+	loop.currentShader = shader
+	shader.Use()
 	loop.AssignCameraMatrices()
 }
 
@@ -98,7 +90,7 @@ func (loop *RenderLoop) UpdateRoutine(deltaTime float64) {
 	loop.Clear()
 	loop.UpdateCameraMatrices()
 
-	loop.AssignShaderID(loop.basicShader)
+	loop.AssignShader(loop.basicShader)
 	gl.BindVertexArray(loop.triangleVAO)
 	gl.DrawArrays(gl.TRIANGLES, 0, 3)
 }
