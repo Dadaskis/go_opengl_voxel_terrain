@@ -11,8 +11,8 @@ import (
 
 type RenderLoop struct {
 	openGLVersion string
-	basicShader   *Shader
-	triangleVAO   uint32
+	basicShader   Shader
+	triangleMesh  Mesh
 	clearColor    mgl32.Vec4
 	window        *Window
 	currentShader *Shader
@@ -37,9 +37,9 @@ func (loop *RenderLoop) Initialize(window *Window) {
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Println("OpenGL version", version)
 
-	loop.basicShader = &Shader{}
+	loop.basicShader = Shader{}
 	loop.basicShader.LoadFile("basic")
-	loop.triangleVAO = GetTriangleMesh()
+	loop.triangleMesh = GetTriangleMesh()
 }
 
 func (loop *RenderLoop) Clear() {
@@ -79,8 +79,6 @@ func (loop *RenderLoop) AssignShader(shader *Shader) {
 }
 
 func (loop *RenderLoop) UpdateRoutine(deltaTime float64) {
-	fmt.Println(deltaTime)
-
 	time := glfw.GetTime()
 	loop.cameraPos = mgl32.Vec3{
 		float32(math.Cos(time) * 2.0), 0, float32(math.Sin(time) * 2.0),
@@ -90,7 +88,6 @@ func (loop *RenderLoop) UpdateRoutine(deltaTime float64) {
 	loop.Clear()
 	loop.UpdateCameraMatrices()
 
-	loop.AssignShader(loop.basicShader)
-	gl.BindVertexArray(loop.triangleVAO)
-	gl.DrawArrays(gl.TRIANGLES, 0, 3)
+	loop.AssignShader(&loop.basicShader)
+	loop.triangleMesh.Render()
 }
