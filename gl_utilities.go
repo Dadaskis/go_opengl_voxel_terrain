@@ -11,7 +11,7 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
-func GetTriangleMesh(program uint32) uint32 {
+func GetTriangleMesh() uint32 {
 	// Vertices with position and color
 	vertices := []float32{
 		// Positions        // Colors
@@ -30,13 +30,11 @@ func GetTriangleMesh(program uint32) uint32 {
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(vertices)*4, gl.Ptr(vertices), gl.STATIC_DRAW)
 
-	vertAttrib := uint32(gl.GetAttribLocation(program, GLString("vert")))
-	gl.EnableVertexAttribArray(vertAttrib)
-	gl.VertexAttribPointerWithOffset(vertAttrib, 3, gl.FLOAT, false, 6*4, 0)
+	gl.EnableVertexAttribArray(0)
+	gl.VertexAttribPointerWithOffset(0, 3, gl.FLOAT, false, 6*4, 0)
 
-	texCoordAttrib := uint32(gl.GetAttribLocation(program, GLString("vertColor")))
-	gl.EnableVertexAttribArray(texCoordAttrib)
-	gl.VertexAttribPointerWithOffset(texCoordAttrib, 3, gl.FLOAT, false, 6*4, 3*4)
+	gl.EnableVertexAttribArray(1)
+	gl.VertexAttribPointerWithOffset(1, 3, gl.FLOAT, false, 6*4, 3*4)
 
 	return vao
 }

@@ -39,7 +39,7 @@ func (loop *RenderLoop) Initialize(window *Window) {
 
 	loop.basicShader = &Shader{}
 	loop.basicShader.LoadFile("basic")
-	loop.triangleVAO = GetTriangleMesh(loop.basicShader.ID)
+	loop.triangleVAO = GetTriangleMesh()
 }
 
 func (loop *RenderLoop) Clear() {
