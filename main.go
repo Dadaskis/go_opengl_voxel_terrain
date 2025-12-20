@@ -15,7 +15,7 @@ func init() {
 
 func main() {
 	window.Initialize(640, 480, "Voxel Terrain")
-	renderLoop.Initialize()
+	renderLoop.Initialize(&window)
 	window.updateCallbacks = append(window.updateCallbacks, renderLoop.UpdateRoutine)
 	window.EnterUpdateLoop()
 }
