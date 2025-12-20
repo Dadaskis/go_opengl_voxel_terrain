@@ -6,6 +6,7 @@ type Window struct {
 	width, height   int
 	windowObj       *glfw.Window
 	updateCallbacks []func(float64)
+	cursorCallbacks []func(float64, float64)
 }
 
 func (window *Window) Initialize(startWidth, startHeight int, titleName string) {
@@ -13,7 +14,6 @@ func (window *Window) Initialize(startWidth, startHeight int, titleName string) 
 	if err != nil {
 		panic(err)
 	}
-	//defer glfw.Terminate()
 
 	glfw.WindowHint(glfw.Resizable, glfw.True)
 	glfw.WindowHint(glfw.ContextVersionMajor, 3)
@@ -28,7 +28,15 @@ func (window *Window) Initialize(startWidth, startHeight int, titleName string) 
 		panic(err)
 	}
 
+	cursorCallback := func(w *glfw.Window, xpos, ypos float64) {
+		for _, callback := range window.cursorCallbacks {
+			callback(xpos, ypos)
+		}
+	}
+
 	windowObj.MakeContextCurrent()
+	windowObj.SetCursorPosCallback(cursorCallback)
+	windowObj.SetInputMode(glfw.CursorMode, glfw.CursorDisabled)
 }
 
 func (window *Window) Terminate() {

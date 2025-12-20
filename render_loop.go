@@ -2,26 +2,24 @@ package main
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/go-gl/gl/v3.3-core/gl"
-	"github.com/go-gl/glfw/v3.3/glfw"
 	"github.com/go-gl/mathgl/mgl32"
 )
 
 type RenderLoop struct {
-	openGLVersion string
-	basicShader   Shader
-	triangleMesh  Mesh
-	clearColor    mgl32.Vec4
-	window        *Window
-	currentShader *Shader
-	projection    mgl32.Mat4
-	camera        mgl32.Mat4
-	model         mgl32.Mat4
-	cameraPos     mgl32.Vec3
-	cameraTarget  mgl32.Vec3
-	FOV           float32
+	openGLVersion    string
+	basicShader      Shader
+	triangleMesh     Mesh
+	clearColor       mgl32.Vec4
+	window           *Window
+	currentShader    *Shader
+	camera           *Camera
+	projection       mgl32.Mat4
+	model            mgl32.Mat4
+	cursorPrevPosX   float64
+	cursorPrevPosY   float64
+	cursorFirstFrame bool
 }
 
 func (loop *RenderLoop) Initialize(window *Window) {
@@ -32,7 +30,9 @@ func (loop *RenderLoop) Initialize(window *Window) {
 
 	loop.clearColor = mgl32.Vec4{0.0, 0.3, 1.0, 1.0}
 	loop.window = window
-	loop.FOV = 45.0
+	loop.camera = &Camera{}
+	loop.camera.InitializeDefaultValues()
+	window.cursorCallbacks = append(window.cursorCallbacks, loop.CursorMove)
 
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	fmt.Println("OpenGL version", version)
@@ -42,10 +42,25 @@ func (loop *RenderLoop) Initialize(window *Window) {
 	loop.triangleMesh = GetTriangleMesh()
 }
 
+func (loop *RenderLoop) CursorMove(xpos, ypos float64) {
+	if !loop.cursorFirstFrame {
+		loop.cursorFirstFrame = true
+		loop.cursorPrevPosX = xpos
+		loop.cursorPrevPosY = ypos
+		return
+	}
+	modXPos := xpos - loop.cursorPrevPosX
+	modYPos := ypos - loop.cursorPrevPosY
+	loop.camera.ProcessMouseMovement(modXPos, modYPos)
+	loop.cursorPrevPosX = xpos
+	loop.cursorPrevPosY = ypos
+}
+
 func (loop *RenderLoop) Clear() {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	gl.Enable(gl.DEPTH_TEST)
 	gl.DepthFunc(gl.LESS)
+	gl.CullFace(gl.BACK)
 	gl.ClearColor(
 		loop.clearColor[0], loop.clearColor[1],
 		loop.clearColor[2], loop.clearColor[3])
@@ -55,11 +70,7 @@ func (loop *RenderLoop) UpdateCameraMatrices() {
 	windowWidth, windowHeight := loop.window.width, loop.window.height
 
 	loop.projection = mgl32.Perspective(
-		mgl32.DegToRad(loop.FOV), float32(windowWidth)/float32(windowHeight), 0.1, 10.0,
-	)
-
-	loop.camera = mgl32.LookAtV(
-		loop.cameraPos, loop.cameraTarget, mgl32.Vec3{0, 1, 0},
+		mgl32.DegToRad(loop.camera.FOV), float32(windowWidth)/float32(windowHeight), 0.1, 10.0,
 	)
 
 	loop.model = mgl32.Ident4()
@@ -68,7 +79,8 @@ func (loop *RenderLoop) UpdateCameraMatrices() {
 func (loop *RenderLoop) AssignCameraMatrices() {
 	shader := loop.currentShader
 	shader.UniformSetMat4("projection", &loop.projection)
-	shader.UniformSetMat4("camera", &loop.camera)
+	cameraMatrix := loop.camera.GetViewMatrix()
+	shader.UniformSetMat4("camera", &cameraMatrix)
 	shader.UniformSetMat4("model", &loop.model)
 }
 
@@ -79,11 +91,7 @@ func (loop *RenderLoop) AssignShader(shader *Shader) {
 }
 
 func (loop *RenderLoop) UpdateRoutine(deltaTime float64) {
-	time := glfw.GetTime()
-	loop.cameraPos = mgl32.Vec3{
-		float32(math.Cos(time) * 2.0), 0, float32(math.Sin(time) * 2.0),
-	}
-	loop.cameraTarget = mgl32.Vec3{0, 0, 0}
+	loop.camera.ProcessKeyboard(loop.window)
 
 	loop.Clear()
 	loop.UpdateCameraMatrices()
