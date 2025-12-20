@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -29,7 +28,7 @@ func (camera *Camera) InitializeDefaultValues() {
 	camera.worldUp = mgl32.Vec3{0.0, 1.0, 0.0}
 	camera.yaw = 275.0
 	camera.pitch = 0.0
-	camera.movementSpeed = 0.005
+	camera.movementSpeed = 10.0
 	camera.mouseSensitivity = 0.1
 	camera.FOV = 90.0
 	camera.UpdateCameraVectors()
@@ -72,30 +71,34 @@ func (camera *Camera) ProcessMouseMovement(xpos, ypos float64) {
 	camera.UpdateCameraVectors()
 }
 
-func (camera *Camera) ProcessKeyboard(window *Window) {
+func (camera *Camera) ProcessKeyboard(window *Window, deltaTime float64) {
 	if window.windowObj.GetKey(glfw.KeyW) == glfw.Press {
-		camera.position = camera.position.Add(camera.front.Mul(camera.movementSpeed))
+		camera.position = camera.position.Add(
+			camera.front.Mul(camera.movementSpeed * float32(deltaTime)))
 	}
 
 	if window.windowObj.GetKey(glfw.KeyS) == glfw.Press {
-		camera.position = camera.position.Add(camera.front.Mul(-camera.movementSpeed))
+		camera.position = camera.position.Add(
+			camera.front.Mul(-camera.movementSpeed * float32(deltaTime)))
 	}
 
 	if window.windowObj.GetKey(glfw.KeyA) == glfw.Press {
-		camera.position = camera.position.Add(camera.right.Mul(-camera.movementSpeed))
+		camera.position = camera.position.Add(
+			camera.right.Mul(-camera.movementSpeed * float32(deltaTime)))
 	}
 
 	if window.windowObj.GetKey(glfw.KeyD) == glfw.Press {
-		camera.position = camera.position.Add(camera.right.Mul(camera.movementSpeed))
+		camera.position = camera.position.Add(
+			camera.right.Mul(camera.movementSpeed * float32(deltaTime)))
 	}
 
 	if window.windowObj.GetKey(glfw.KeySpace) == glfw.Press {
-		camera.position = camera.position.Add(camera.up.Mul(camera.movementSpeed))
+		camera.position = camera.position.Add(
+			camera.up.Mul(camera.movementSpeed * float32(deltaTime)))
 	}
 
 	if window.windowObj.GetKey(glfw.KeyLeftControl) == glfw.Press {
-		camera.position = camera.position.Add(camera.up.Mul(-camera.movementSpeed))
+		camera.position = camera.position.Add(
+			camera.up.Mul(-camera.movementSpeed * float32(deltaTime)))
 	}
-
-	fmt.Println(camera.position)
 }

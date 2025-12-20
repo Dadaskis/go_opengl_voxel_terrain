@@ -5,7 +5,7 @@ import (
 )
 
 var window Window
-var renderLoop RenderLoop
+var gameLoop GameLoop
 
 func init() {
 	// This is needed to arrange that main() runs on main thread.
@@ -14,8 +14,8 @@ func init() {
 }
 
 func main() {
-	window.Initialize(640, 480, "Voxel Terrain")
-	renderLoop.Initialize(&window)
-	window.updateCallbacks = append(window.updateCallbacks, renderLoop.UpdateRoutine)
+	window.Initialize(1280, 720, "Voxel Terrain")
+	gameLoop.Initialize(&window)
+	window.updateCallbacks = append(window.updateCallbacks, gameLoop.UpdateRoutine)
 	window.EnterUpdateLoop()
 }

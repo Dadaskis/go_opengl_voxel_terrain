@@ -10,8 +10,10 @@ layout(location = 2) in vec3 vertNormal;
 layout(location = 3) in vec2 vertUV;
 
 out vec3 fragVertColor;
+out vec2 fragUV;
 
 void main() {
     fragVertColor = vertColor;
+    fragUV = vertUV;
     gl_Position = projection * camera * model * vec4(vert, 1);
 }
