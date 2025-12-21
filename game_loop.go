@@ -43,6 +43,7 @@ func (loop *GameLoop) Initialize(window *Window) {
 	loop.triangleMesh = GetTriangleMesh()
 
 	loop.gameWorld.Initialize()
+	loop.gameWorld.currentCamera = loop.camera
 
 	texture, err := NewTexture("atlas.png")
 	if err != nil {

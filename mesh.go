@@ -13,8 +13,9 @@ type MeshVertex struct {
 }
 
 type Mesh struct {
-	vertices []MeshVertex
-	VAO      uint32
+	vertices  []MeshVertex
+	arrayData []float32
+	VAO       uint32
 }
 
 func (mesh *Mesh) AddVertex(position, color, normal mgl32.Vec3, UV mgl32.Vec2) {
@@ -37,7 +38,7 @@ func appendVec2ToArray(array []float32, vec *mgl32.Vec2) []float32 {
 	return array
 }
 
-func (mesh *Mesh) UpdateVAO() {
+func (mesh *Mesh) PrepareArrayData() {
 	vertices := []float32{}
 
 	for _, vertex := range mesh.vertices {
@@ -46,6 +47,12 @@ func (mesh *Mesh) UpdateVAO() {
 		vertices = appendVec3ToArray(vertices, &vertex.normal)
 		vertices = appendVec2ToArray(vertices, &vertex.UV)
 	}
+
+	mesh.arrayData = vertices
+}
+
+func (mesh *Mesh) UpdateVAO() {
+	vertices := mesh.arrayData
 
 	// Configure the vertex data
 	var vao uint32

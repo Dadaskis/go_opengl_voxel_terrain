@@ -6,42 +6,46 @@ import (
 )
 
 type Chunk struct {
-	position mgl32.Vec2
-	blocks   [16][16][256]int
-	mesh     Mesh
+	position    mgl32.Vec2
+	blocks      [16][16][256]int
+	mesh        Mesh
+	isMeshDirty bool
 }
 
 func (chunk *Chunk) Generate() {
-	noise := opensimplex.New(0)
-	blockPos := chunk.position.Mul(16)
-	scale := 0.01
-	caveScale := 0.04
-	for x := range 16 {
-		for y := range 16 {
-			height := 50 + noise.Eval2(
-				float64(int(blockPos[0])+x)*scale,
-				float64(int(blockPos[1])+y)*scale,
-			)*30.0
-			for z := range int(height) {
-				chunk.blocks[x][y][z] = BLOCK_STONE
-				if (int(height) - z) < 5 {
-					chunk.blocks[x][y][z] = BLOCK_DIRT
+	go func() {
+		noise := opensimplex.New(0)
+		blockPos := chunk.position.Mul(16)
+		scale := 0.01
+		caveScale := 0.04
+		for x := range 16 {
+			for y := range 16 {
+				height := 50 + noise.Eval2(
+					float64(int(blockPos[0])+x)*scale,
+					float64(int(blockPos[1])+y)*scale,
+				)*30.0
+				for z := range int(height) {
+					chunk.blocks[x][y][z] = BLOCK_STONE
+					if (int(height) - z) < 5 {
+						chunk.blocks[x][y][z] = BLOCK_DIRT
+					}
+					if (int(height) - z) <= 1 {
+						chunk.blocks[x][y][z] = BLOCK_GRASS
+					}
+					caveValue := noise.Eval3(
+						float64(int(blockPos[0])+x)*caveScale,
+						float64(int(blockPos[1])+y)*caveScale,
+						float64(z)*caveScale,
+					)
+					if caveValue > 0.6 {
+						chunk.blocks[x][y][z] = BLOCK_AIR
+					}
 				}
-				if (int(height) - z) <= 1 {
-					chunk.blocks[x][y][z] = BLOCK_GRASS
-				}
-				caveValue := noise.Eval3(
-					float64(int(blockPos[0])+x)*caveScale,
-					float64(int(blockPos[1])+y)*caveScale,
-					float64(z)*caveScale,
-				)
-				if caveValue > 0.6 {
-					chunk.blocks[x][y][z] = BLOCK_AIR
-				}
+				chunk.blocks[x][y][0] = BLOCK_STONE
 			}
-			chunk.blocks[x][y][0] = BLOCK_STONE
 		}
-	}
+		chunk.UpdateMesh()
+	}()
 }
 
 func (chunk *Chunk) UpdateMesh() {
@@ -406,9 +410,16 @@ func (chunk *Chunk) UpdateMesh() {
 			}
 		}
 	}
-	chunk.mesh.UpdateVAO()
+
+	chunk.mesh.PrepareArrayData()
+
+	chunk.isMeshDirty = true
 }
 
 func (chunk *Chunk) Render() {
+	if chunk.isMeshDirty == true {
+		chunk.mesh.UpdateVAO()
+		chunk.isMeshDirty = false
+	}
 	chunk.mesh.Render()
 }

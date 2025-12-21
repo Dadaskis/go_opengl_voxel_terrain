@@ -19,6 +19,7 @@ func GetTriangleMesh() Mesh {
 	mesh.AddVertex(mgl32.Vec3{0.5, -0.5, 0.0}, mgl32.Vec3{0.0, 1.0, 0.0}, mgl32.Vec3{1.0, 0.0, 0.0}, mgl32.Vec2{0.0, 0.0})
 	mesh.AddVertex(mgl32.Vec3{0.0, 0.5, 0.0}, mgl32.Vec3{0.0, 0.0, 1.0}, mgl32.Vec3{1.0, 0.0, 0.0}, mgl32.Vec2{0.0, 0.0})
 
+	mesh.PrepareArrayData()
 	mesh.UpdateVAO()
 
 	return mesh
