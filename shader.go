@@ -23,6 +23,11 @@ func (shader *Shader) UniformSetMat4(uniformName string, mat4 *mgl32.Mat4) {
 	gl.UniformMatrix4fv(uniform, 1, false, &mat4[0])
 }
 
+func (shader *Shader) UniformSetVec3(uniformName string, vec3 *mgl32.Vec3) {
+	uniform := gl.GetUniformLocation(shader.ID, GLString(uniformName))
+	gl.Uniform3f(uniform, vec3[0], vec3[1], vec3[2])
+}
+
 func (shader *Shader) LoadFile(fileName string) {
 	content, err := os.ReadFile(fileName + ".glsl_vert")
 	if err != nil {

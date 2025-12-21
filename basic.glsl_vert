@@ -11,8 +11,12 @@ layout(location = 3) in vec2 vertUV;
 
 out vec3 fragVertColor;
 out vec2 fragUV;
+out vec3 fragNormal;
+out vec3 fragPos;
 
 void main() {
+    fragPos = vec3(model * vec4(vert, 1.0));
+    fragNormal = mat3(transpose(inverse(model))) * vertNormal;
     fragVertColor = vertColor;
     fragUV = vertUV;
     gl_Position = projection * camera * model * vec4(vert, 1);

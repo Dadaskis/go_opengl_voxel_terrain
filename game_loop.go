@@ -91,6 +91,7 @@ func (loop *GameLoop) AssignCameraMatrices() {
 	cameraMatrix := loop.camera.GetViewMatrix()
 	shader.UniformSetMat4("camera", &cameraMatrix)
 	shader.UniformSetMat4("model", &loop.model)
+	shader.UniformSetVec3("viewPos", &loop.camera.position)
 }
 
 func (loop *GameLoop) AssignShader(shader *Shader) {

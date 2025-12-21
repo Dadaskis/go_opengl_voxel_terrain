@@ -8,4 +8,4 @@ require (
 	github.com/go-gl/mathgl v1.2.0
 )
 
-require github.com/ojrac/opensimplex-go v1.0.2 // indirect
+require github.com/ojrac/opensimplex-go v1.0.2

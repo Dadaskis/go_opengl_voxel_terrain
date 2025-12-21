@@ -21,7 +21,7 @@ type Camera struct {
 }
 
 func (camera *Camera) InitializeDefaultValues() {
-	camera.position = mgl32.Vec3{0.0, 0.0, 3.0}
+	camera.position = mgl32.Vec3{0.0, 60.0, 0.0}
 	camera.front = mgl32.Vec3{0.0, 0.0, 1.0}
 	camera.up = mgl32.Vec3{0.0, 1.0, 0.0}
 	camera.right = mgl32.Vec3{-1.0, 0.0, 0.0}
