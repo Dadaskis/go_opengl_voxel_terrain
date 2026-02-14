@@ -8,7 +8,7 @@ A Minecraft-style voxel terrain generator built with Go, OpenGL, and GLFW. This 
 
 ## Features
 
-- **Procedural Terrain Generation**: Uses OpenSimplex noise to create realistic terrain with mountains, caves, and varied biomes
+- **Procedural Terrain Generation**: Uses OpenSimplex noise to create realistic terrain with mountains and caves
 - **Chunk-Based World**: 16×16×256 block chunks with efficient face culling for optimal rendering
 - **First-Person Camera**: Full mouse look and keyboard controls (WASD + Space/Ctrl for vertical movement)
 - **Dynamic Loading**: Chunks load and unload based on camera position with background generation
