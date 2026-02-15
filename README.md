@@ -43,7 +43,7 @@ A Minecraft-style voxel terrain generator built with Go, OpenGL, and GLFW. This 
 1. Clone the repository:
 ```bash
 git clone https://github.com/Dadaskis/go_opengl_voxel_terrain
-cd voxel-terrain-go
+cd go_opengl_voxel_terrain
 ```
 
 2. Install dependencies:
