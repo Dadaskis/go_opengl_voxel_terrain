@@ -36,7 +36,43 @@ A Minecraft-style voxel terrain generator built with Go, OpenGL, and GLFW. This 
 
 - Go 1.21 or higher
 - OpenGL 3.3 compatible graphics card
-- GLFW3 development libraries
+- **Windows**: MinGW-w64 (for CGo support)
+- **Linux**: GLFW3 development libraries
+- **macOS**: Xcode Command Line Tools
+
+### Platform-Specific Setup
+
+#### Windows
+1. **Install MinGW-w64** (required for CGo to work with OpenGL):
+   - **Option A - Using MSYS2 (Recommended)**:
+     ```bash
+     # Download and install MSYS2 from https://www.msys2.org/
+     # Then open MSYS2 terminal and run:
+     pacman -S mingw-w64-x86_64-gcc
+     ```
+   - **Option B - Direct download**:
+     Download from [MinGW-w64](https://www.mingw-w64.org/downloads/) and install
+
+2. **Add MinGW to PATH**:
+   - Add `C:\msys64\mingw64\bin` (or your MinGW installation path) to your system's PATH environment variable
+   - Verify installation:
+     ```bash
+     gcc --version
+     ```
+
+#### Linux (Ubuntu/Debian)
+```bash
+sudo apt update
+sudo apt install libgl1-mesa-dev xorg-dev gcc gcc-go
+```
+*I didn't check it on Ubuntu/Debian, so I can't promise you that it'll work*
+
+#### macOS
+```bash
+xcode-select --install
+brew install glfw
+```
+*I don't have any devices with MacOS so... I'm not sure it'll work either*
 
 ### Installation
 
@@ -46,21 +82,39 @@ git clone https://github.com/Dadaskis/go_opengl_voxel_terrain
 cd go_opengl_voxel_terrain
 ```
 
-2. Install dependencies:
+2. Initialize and download dependencies:
 ```bash
 go mod init go_opengl_voxel_terrain
-go get github.com/go-gl/gl/v3.3-core/gl
-go get github.com/go-gl/glfw/v3.3/glfw
-go get github.com/go-gl/mathgl/mgl32
-go get github.com/ojrac/opensimplex-go
+go mod tidy
 ```
 
-3. Place a texture atlas at `atlas.png` (1024×1024 texture, where a single tile is 64×64)
-
-4. Run the game:
+3. Run the game:
 ```bash
 go run .
 ```
+
+**Note for Windows**: If you encounter build constraint errors with the OpenGL package, ensure MinGW is properly installed and in your PATH. The error "build constraints exclude all Go files" typically resolves after adding MinGW to PATH.
+
+### Troubleshooting Common Issues
+
+#### "build constraints exclude all Go files" error
+- **Cause**: Missing or incorrectly configured MinGW installation
+- **Solution**: 
+  1. Verify MinGW is installed: `gcc --version`
+  2. Check MinGW is in PATH: `echo $PATH`
+  3. Ensure CGo is enabled: `go env CGO_ENABLED` should return "1"
+
+#### GLFW-related errors
+- **Windows**: Make sure `mingw-w64-x86_64-gcc` is installed via MSYS2
+- **Linux**: Install GLFW dev libraries: `sudo apt install libglfw3-dev`
+- **macOS**: Install GLFW via Homebrew: `brew install glfw`
+
+#### "undefined: gl.Init" or similar OpenGL errors
+- Ensure you're using the correct OpenGL package import:
+  ```go
+  import "github.com/go-gl/gl/v3.3-core/gl"
+  ```
+- Ensure that your GPU supports OpenGL 3.3
 
 ## Controls
 
