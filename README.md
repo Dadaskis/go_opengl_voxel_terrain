@@ -67,6 +67,14 @@ sudo apt install libgl1-mesa-dev xorg-dev gcc gcc-go
 ```
 *I didn't check it on Ubuntu/Debian, so I can't promise you that it'll work*
 
+#### Linux (Arch)
+Okay, so, Arch is somewhat easier(?)
+```bash
+sudo pacman -Syu
+sudo pacman -S go gcc
+```
+And then you can simply run it, that's it.
+
 #### macOS
 ```bash
 xcode-select --install
