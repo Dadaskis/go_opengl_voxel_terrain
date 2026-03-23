@@ -186,3 +186,6 @@ go run .
 - Inspired by Minecraft's infinite world generation
 - Uses OpenSimplex noise (public domain alternative to Perlin noise)
 - Built with modern OpenGL practices and Go's concurrency model
+
+## License
+MIT License! *Happiness to everyone!*
